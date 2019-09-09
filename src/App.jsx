@@ -1,8 +1,8 @@
 import React from 'react';
 //路由库
 import {BrowserRouter as Router, Switch,Route} from 'react-router-dom';
-import Home from "./components/home";
-import Login from "./components/login";
+
+import routers from './config/routes'
 
 export default class App extends React.Component {
     constructor(props) {
@@ -14,8 +14,12 @@ export default class App extends React.Component {
             <Router>
                 <p>app</p>
                 <Switch>
-                    <Route path="/" exact component={Home}/>
-                    <Route path="/login" exact component={Login}/>
+                    {
+                        routers.map( (router,index)=>{
+                           return <Route {...router} key={index}/>
+                            })
+                    }
+
                 </Switch>
             </Router>
         );
