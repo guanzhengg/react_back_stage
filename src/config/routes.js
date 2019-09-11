@@ -4,7 +4,6 @@
 * */
 
 import Home from "../components/home";
-import React from "react";
 import Login from "../components/login";
 
  const routers=[

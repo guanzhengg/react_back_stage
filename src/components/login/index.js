@@ -1,10 +1,17 @@
 import React from 'react';
 import logo from './logo.png'
-import {Form,Input,Icon,Button} from "antd";
+import {Form, Input, Icon, Button, message} from "antd";
+import axios from 'axios'
 import "./index.less"
+import {connect} from 'react-redux'
+import {usermsg} from "../../redux/action-creators";
 
+@connect(
+    null,
+    {usermsg}
+)
 @Form.create()
- class Login extends React.Component{
+class Login extends React.Component {
     /**
      * 自定义表单校验的方法
      * @param rule 包含表单项字段
@@ -34,48 +41,93 @@ import "./index.less"
         // callback必须调用
         callback();
     };
+    handleSubmit = (event) => {
+        event.preventDefault();
+        //validateFields 校验并获取一组输入域的值与 Error，若 fieldNames 参数为空，则校验全部组件
+        this.props.form.validateFields((err, values) => {
+            console.log(err, values);
+            if (!err) {
+                const {username, password} = values;
+                //服务器是 localhost5000 需要代理服务器 去package.json 配置 "proxy": "http://localhost:5000"
+                axios.post("http://localhost:3000/api/login", {username, password})
+
+                    .then((response) => {
+                        console.log(response.data);
+                        //请求成功 并且请求功能正确即 status===0
+                        if (response.data.status === 0) {
+
+                            //保存用户信息和token到redux
+                            console.log(response.data.data);
+                            this.props.usermsg(response.data.data);
+                            message.success('登陆成功');
+                            //重定向到home
+
+                            this.props.history.replace("/")
+                        } else {
+                            // this.props.form.resetFields(['password'])
+                            message.error(response.data.msg);
+
+                        }
+                    })
+                    .catch((error) => {
+                        // this.props.form.resetFields(['password'])
+                        message.error('网络错误');
+
+                    })
+                    //.finally 不管成功失败都调用
+                    .finally( ()=>{
+                        this.props.form.resetFields(['password'])
+                        })
+            }
+        })
+
+
+    };
+
     render() {
-        const { getFieldDecorator }=this.props.form;
+        const {getFieldDecorator} = this.props.form;
+        console.log(1, this.props);
         return (
-           <div className="login">
-               <header className="login-header">
-                   <img src={logo} alt="atguigu"/>
-                   <h1>react 后台管理系统</h1>
-                 </header>
-               <Form className="login-body" onSubmit={this.handleSubmit}>
-                   <h2>用户登录</h2>
-                   <Form.Item>
+            <div className="login">
+                <header className="login-header">
+                    <img src={logo} alt="atguigu"/>
+                    <h1>react 后台管理系统</h1>
+                </header>
+                <Form className="login-body" onSubmit={this.handleSubmit}>
+                    <h2>用户登录</h2>
+                    <Form.Item>
 
-                       { getFieldDecorator('username', {
-                           // rules: [{ required: true, message: '请输入用户名' },
-                           //     {   max:16 ,message:"长度不超过16"},
-                           //     {min :3,message:"长度不少于3"},
-                           //     {pattern:/^[a-zA-Z0-9_]{3-16}$/  , message:"请输入合法字符"}
-                           // ],
-                           rules: [  {validator: this.validator}],
-                       })(
-                           <Input type="text" placeholder="请输入用户名" prefix={<Icon type="user" />}/>
-                       )}
-
-
-                   </Form.Item>
-                   <Form.Item>
-                       {
-                           getFieldDecorator('password', {
-                           rules: [  {validator: this.validator}],
-                       })(
-                           <Input type="password" placeholder="请输入密码" prefix={<Icon type="lock" />}/>
-                       )}
+                        {getFieldDecorator('username', {
+                            // rules: [{ required: true, message: '请输入用户名' },
+                            //     {   max:16 ,message:"长度不超过16"},
+                            //     {min :3,message:"长度不少于3"},
+                            //     {pattern:/^[a-zA-Z0-9_]{3-16}$/  , message:"请输入合法字符"}
+                            // ],
+                            rules: [{validator: this.validator}],
+                        })(
+                            <Input type="text" placeholder="请输入用户名" prefix={<Icon type="user"/>}/>
+                        )}
 
 
-                   </Form.Item>
-                   <Form.Item>
-                   <Button className="login-btn" type="primary" htmlType="submit" >登录</Button>
-                   </Form.Item>
-               </Form>
-           </div>
+                    </Form.Item>
+                    <Form.Item>
+                        {
+                            getFieldDecorator('password', {
+                                rules: [{validator: this.validator}],
+                            })(
+                                <Input type="password" placeholder="请输入密码" prefix={<Icon type="lock"/>}/>
+                            )}
+
+
+                    </Form.Item>
+                    <Form.Item>
+                        <Button className="login-btn" type="primary" htmlType="submit">登录</Button>
+                    </Form.Item>
+                </Form>
+            </div>
         );
     };
 
 }
+
 export default Login
