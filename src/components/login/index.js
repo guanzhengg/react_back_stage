@@ -1,7 +1,10 @@
 import React from 'react';
 import logo from './logo.png'
 import {Form, Input, Icon, Button, message} from "antd";
-import axios from 'axios'
+// import axios from 'axios'
+//封装过axios 拦截器 所有改用拦截器
+
+import axios from '../../api/request'
 import "./index.less"
 import {connect} from 'react-redux'
 import {usermsg} from "../../redux/action-creators";
@@ -49,33 +52,33 @@ class Login extends React.Component {
             if (!err) {
                 const {username, password} = values;
                 //服务器是 localhost5000 需要代理服务器 去package.json 配置 "proxy": "http://localhost:5000"
-                axios.post("http://localhost:3000/api/login", {username, password})
+                axios.post("/login", {username, password})
 
-                    .then((response) => {
-                        console.log(response.data);
+                    .then((result) => {
+
                         //请求成功 并且请求功能正确即 status===0
-                        if (response.data.status === 0) {
+                        // if (response.data.status === 0) {
 
                             //保存用户信息和token到redux
-                            console.log(response.data.data);
-                            this.props.usermsg(response.data.data);
+                            console.log(result);
+                            this.props.usermsg(result);
                             message.success('登陆成功');
                             //重定向到home
 
                             this.props.history.replace("/")
-                        } else {
-                            // this.props.form.resetFields(['password'])
-                            message.error(response.data.msg);
-
-                        }
+                        // }
+                        // else {
+                        //     // this.props.form.resetFields(['password'])
+                        //     message.error(response.data.msg);
+                        //
+                        // }
                     })
-                    .catch((error) => {
+                    // .catch((error) => {
                         // this.props.form.resetFields(['password'])
-                        message.error('网络错误');
-
-                    })
+                        // message.error('网络错误');
+                    // })
                     //.finally 不管成功失败都调用
-                    .finally( ()=>{
+                    .catch( ()=>{
                         this.props.form.resetFields(['password'])
                         })
             }
