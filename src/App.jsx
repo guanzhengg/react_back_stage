@@ -12,7 +12,6 @@ export default class App extends React.Component {
     render() {
         return (
             <Router>
-                <p>app</p>
                 <Switch>
                     {
                         routers.map( (router,index)=>{
