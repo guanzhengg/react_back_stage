@@ -4,7 +4,7 @@
 * */
 
 import Home from "../components/home";
-import Login from "../components/login";
+import Login from "../containers/login";
 
  const routers=[
     {

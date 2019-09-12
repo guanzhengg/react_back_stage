@@ -8,7 +8,11 @@ import axios from '../../api/request'
 import "./index.less"
 import {connect} from 'react-redux'
 import {usermsg} from "../../redux/action-creators";
+import withCheckLogin from '../with-check-login/index'
+import store from '../../redux/store'
 
+
+@withCheckLogin
 @connect(
     null,
     {usermsg}
@@ -66,17 +70,9 @@ class Login extends React.Component {
                             //重定向到home
 
                             this.props.history.replace("/")
-                        // }
-                        // else {
-                        //     // this.props.form.resetFields(['password'])
-                        //     message.error(response.data.msg);
-                        //
-                        // }
+
                     })
-                    // .catch((error) => {
-                        // this.props.form.resetFields(['password'])
-                        // message.error('网络错误');
-                    // })
+
                     //.finally 不管成功失败都调用
                     .catch( ()=>{
                         this.props.form.resetFields(['password'])
@@ -88,8 +84,10 @@ class Login extends React.Component {
     };
 
     render() {
+        console.log(2222,store.getState(),222);
+        console.log('props',this.props);
         const {getFieldDecorator} = this.props.form;
-        console.log(1, this.props);
+
         return (
             <div className="login">
                 <header className="login-header">
@@ -101,11 +99,7 @@ class Login extends React.Component {
                     <Form.Item>
 
                         {getFieldDecorator('username', {
-                            // rules: [{ required: true, message: '请输入用户名' },
-                            //     {   max:16 ,message:"长度不超过16"},
-                            //     {min :3,message:"长度不少于3"},
-                            //     {pattern:/^[a-zA-Z0-9_]{3-16}$/  , message:"请输入合法字符"}
-                            // ],
+
                             rules: [{validator: this.validator}],
                         })(
                             <Input type="text" placeholder="请输入用户名" prefix={<Icon type="user"/>}/>
